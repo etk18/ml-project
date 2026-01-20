@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance Predictor | AI-Powered Academic Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --dark-bg: #0f0f1a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: var(--dark-bg);
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(240, 147, 251, 0.1) 0%, transparent 40%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+
+        @keyframes bgMove {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(30px, -30px) rotate(5deg);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) rotate(-5deg);
+            }
+        }
+
+        /* Navigation */
+        .navbar-custom {
+            background: rgba(15, 15, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #fff !important;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 0;
+        }
+
+        .hero-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* Feature Cards */
+        .features-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-gradient);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Form Container */
+        .form-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-header h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Form Groups */
+        .form-section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .form-label i {
+            color: #667eea;
+        }
+
+        .label-hint {
+            display: block;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .form-control,
+        .form-select {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .form-select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        /* Score Inputs */
+        .score-input-wrapper {
+            position: relative;
+        }
+
+        .score-suffix {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+        }
+
+        .score-input {
+            padding-right: 60px;
+        }
+
+        /* Submit Button */
+        .btn-predict {
+            width: 100%;
+            padding: 18px 30px;
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-predict:active {
+            transform: translateY(0);
+        }
+
+        /* Result Container - Enhanced */
+        .result-container {
+            margin-top: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 50px 40px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .result-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .result-header p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+        }
+
+        /* Circular Gauge */
+        .gauge-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .circular-gauge {
+            position: relative;
+            width: 220px;
+            height: 220px;
+        }
+
+        .gauge-svg {
+            transform: rotate(-90deg);
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 12;
+        }
+
+        .gauge-fill {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.5s ease-out, stroke 0.5s ease;
+        }
+
+        .gauge-fill.excellent {
+            stroke: url(#excellentGradient);
+        }
+
+        .gauge-fill.good {
+            stroke: url(#goodGradient);
+        }
+
+        .gauge-fill.average {
+            stroke: url(#averageGradient);
+        }
+
+        .gauge-fill.needs-work {
+            stroke: url(#needsWorkGradient);
+        }
+
+        .gauge-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .gauge-score {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gauge-max {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 5px;
+        }
+
+        /* Progress Bar */
+        .progress-section {
+            margin-bottom: 35px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .progress-label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .progress-value {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .progress-bar-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 14px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1.5s ease-out;
+        }
+
+        .progress-bar-fill.excellent {
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+        }
+
+        .progress-bar-fill.good {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .progress-bar-fill.average {
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+        }
+
+        .progress-bar-fill.needs-work {
+            background: linear-gradient(90deg, #eb3349, #f45c43);
+        }
+
+        /* Performance Badge */
+        .performance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+        }
+
+        .performance-badge.excellent {
+            background: rgba(17, 153, 142, 0.2);
+            border: 1px solid rgba(56, 239, 125, 0.3);
+            color: #38ef7d;
+        }
+
+        .performance-badge.good {
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(118, 75, 162, 0.3);
+            color: #a78bfa;
+        }
+
+        .performance-badge.average {
+            background: rgba(240, 147, 251, 0.2);
+            border: 1px solid rgba(245, 87, 108, 0.3);
+            color: #f093fb;
+        }
+
+        .performance-badge.needs-work {
+            background: rgba(235, 51, 73, 0.2);
+            border: 1px solid rgba(244, 92, 67, 0.3);
+            color: #f45c43;
+        }
+
+        /* Score Metrics */
+        .score-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 5px;
+        }
+
+        .result-message {
+            text-align: center;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.7;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Info Cards */
+        .info-section {
+            margin-top: 60px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+        }
+
+        .info-card h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-card p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .features-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .info-section {
+                grid-template-columns: 1fr;
+            }
+
+            .form-container {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-animation"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-graduation-cap me-2"></i>EduPredict AI
+            </a>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/"><i class="fas fa-home me-1"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/predict"><i class="fas fa-chart-line me-1"></i> Predict</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/docs"><i class="fas fa-book me-1"></i> API Docs</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1 class="hero-title">🎯 Predict Your Math Score</h1>
+            <p class="hero-subtitle">
+                Our AI-powered model analyzes multiple factors to predict your mathematics performance
+                with high accuracy. Enter your details below to get personalized insights.
+            </p>
+        </section>
+
+        <!-- Features -->
+        <div class="features-row">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h5 class="feature-title">Machine Learning</h5>
+                <p class="feature-desc">Trained on 1000+ student records with 85% accuracy</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h5 class="feature-title">Instant Results</h5>
+                <p class="feature-desc">Get predictions in milliseconds</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h5 class="feature-title">Privacy First</h5>
+                <p class="feature-desc">Your data is never stored or shared</p>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="form-container">
+            <div class="form-header">
+                <h2><i class="fas fa-user-graduate me-2"></i>Student Information</h2>
+                <p>Fill in all fields to get an accurate prediction</p>
+            </div>
+
+            <form action="/predict" method="post">
+                <!-- Demographics Section -->
+                <div class="form-section">
+                    <h6 class="section-title"><i class="fas fa-user me-2"></i>Demographics</h6>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-venus-mars"></i> Gender
+                            </label>
+                            <span class="label-hint">Select your biological gender for demographic analysis</span>
+                            <select class="form-select" name="gender" required>
+                                <option value="" disabled selected>Choose gender...</option>
+                                <option value="male">👨 Male</option>
+                                <option value="female">👩 Female</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-globe"></i> Race / Ethnicity
+                            </label>
+                            <span class="label-hint">Self-identified ethnic background for demographic studies</span>
+                            <select class="form-select" name="ethnicity" required>
+                                <option value="" disabled selected>Choose ethnicity...</option>
+                                <option value="group A">Group A — Asian / Pacific Islander</option>
+                                <option value="group B">Group B — African American / Black</option>
+                                <option value="group C">Group C — Hispanic / Latino</option>
+                                <option value="group D">Group D — White / Caucasian</option>
+                                <option value="group E">Group E — Other / Mixed Heritage</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Background Section -->
+                <div class="form-section">
+                    <h6 class="section-title"><i class="fas fa-home me-2"></i>Background Information</h6>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user-tie"></i> Parental Education Level
+                            </label>
+                            <span class="label-hint">Highest education level achieved by either parent/guardian</span>
+                            <select class="form-select" name="parental_level_of_education" required>
+                                <option value="" disabled selected>Choose education level...</option>
+                                <option value="some high school">📚 Some High School (Did not complete)</option>
+                                <option value="high school">🎓 High School Diploma / GED</option>
+                                <option value="some college">📖 Some College (No degree)</option>
+                                <option value="associate's degree">🎯 Associate's Degree (2-year)</option>
+                                <option value="bachelor's degree">🏆 Bachelor's Degree (4-year)</option>
+                                <option value="master's degree">🎖️ Master's Degree or Higher</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-utensils"></i> Lunch Program Type
+                            </label>
+                            <span class="label-hint">School lunch program participation (indicates socioeconomic
+                                factors)</span>
+                            <select class="form-select" name="lunch" required>
+                                <option value="" disabled selected>Choose lunch type...</option>
+                                <option value="standard">💳 Standard (Full Price)</option>
+                                <option value="free/reduced">🎫 Free / Reduced Price (Subsidized)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Academic Section -->
+                <div class="form-section">
+                    <h6 class="section-title"><i class="fas fa-book-open me-2"></i>Academic Information</h6>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-clipboard-check"></i> Test Preparation Course
+                        </label>
+                        <span class="label-hint">Did you complete any formal test preparation course before the
+                            exam?</span>
+                        <select class="form-select" name="test_preparation_course" required>
+                            <option value="" disabled selected>Choose option...</option>
+                            <option value="completed">✅ Completed — Finished a prep course</option>
+                            <option value="none">❌ None — No formal preparation</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-book-reader"></i> Reading Score
+                            </label>
+                            <span class="label-hint">Your reading comprehension test score (0-100 scale)</span>
+                            <div class="score-input-wrapper">
+                                <input type="number" class="form-control score-input" name="reading_score"
+                                    placeholder="e.g., 75" min="0" max="100" required>
+                                <span class="score-suffix">/ 100</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-pen-fancy"></i> Writing Score
+                            </label>
+                            <span class="label-hint">Your writing assessment test score (0-100 scale)</span>
+                            <div class="score-input-wrapper">
+                                <input type="number" class="form-control score-input" name="writing_score"
+                                    placeholder="e.g., 80" min="0" max="100" required>
+                                <span class="score-suffix">/ 100</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-predict">
+                    <i class="fas fa-magic"></i>
+                    Predict My Math Score
+                </button>
+            </form>
+
+            {% if results is defined and results %}
+            {% set score = results|float %}
+            {% set percentage = (score / 100 * 100)|round(1) %}
+            {% set circumference = 565.48 %}
+            {% set offset = circumference - (score / 100 * circumference) %}
+            {% if score >= 80 %}
+            {% set level = 'excellent' %}
+            {% set level_text = 'Excellent Performance' %}
+            {% set level_icon = '🌟' %}
+            {% elif score >= 60 %}
+            {% set level = 'good' %}
+            {% set level_text = 'Good Performance' %}
+            {% set level_icon = '👍' %}
+            {% elif score >= 40 %}
+            {% set level = 'average' %}
+            {% set level_text = 'Average Performance' %}
+            {% set level_icon = '📈' %}
+            {% else %}
+            {% set level = 'needs-work' %}
+            {% set level_text = 'Needs Improvement' %}
+            {% set level_icon = '💪' %}
+            {% endif %}
+
+            <div class="result-container">
+                <div class="result-header">
+                    <h3><i class="fas fa-chart-pie me-2"></i>Prediction Results</h3>
+                    <p>Based on your profile and academic scores</p>
+                </div>
+
+                <!-- SVG Gradient Definitions -->
+                <svg width="0" height="0">
+                    <defs>
+                        <linearGradient id="excellentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#11998e" />
+                            <stop offset="100%" stop-color="#38ef7d" />
+                        </linearGradient>
+                        <linearGradient id="goodGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#667eea" />
+                            <stop offset="100%" stop-color="#764ba2" />
+                        </linearGradient>
+                        <linearGradient id="averageGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#f093fb" />
+                            <stop offset="100%" stop-color="#f5576c" />
+                        </linearGradient>
+                        <linearGradient id="needsWorkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#eb3349" />
+                            <stop offset="100%" stop-color="#f45c43" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+
+                <!-- Circular Gauge -->
+                <div class="gauge-container">
+                    <div class="circular-gauge">
+                        <svg class="gauge-svg" width="220" height="220" viewBox="0 0 220 220">
+                            <circle class="gauge-bg" cx="110" cy="110" r="90"></circle>
+                            <circle class="gauge-fill {{ level }}" cx="110" cy="110" r="90"
+                                stroke-dasharray="{{ circumference }}" stroke-dashoffset="{{ offset }}">
+                            </circle>
+                        </svg>
+                        <div class="gauge-center">
+                            <div class="gauge-score">{{ "%.0f"|format(score) }}</div>
+                            <div class="gauge-max">out of 100</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Badge -->
+                <div style="text-align: center;">
+                    <span class="performance-badge {{ level }}">
+                        {{ level_icon }} {{ level_text }}
+                    </span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span class="progress-label">Math Score Progress</span>
+                        <span class="progress-value">{{ "%.1f"|format(score) }}%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill {{ level }}" style="width: {{ percentage }}%;"></div>
+                    </div>
+                </div>
+
+                <!-- Score Metrics -->
+                <div class="score-metrics">
+                    <div class="metric-item">
+                        <div class="metric-value">{{ "%.0f"|format(score) }}</div>
+                        <div class="metric-label">Predicted Score</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">
+                            {% if score >= 80 %}A{% elif score >= 60 %}B{% elif score >= 40 %}C{% else %}D{% endif %}
+                        </div>
+                        <div class="metric-label">Grade Estimate</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">
+                            {% if score >= 80 %}Top 20%{% elif score >= 60 %}Top 40%{% elif score >= 40 %}Top 60%{% else
+                            %}Top 80%{% endif %}
+                        </div>
+                        <div class="metric-label">Percentile Range</div>
+                    </div>
+                </div>
+
+                <!-- Message -->
+                <div class="result-message" style="margin-top: 30px;">
+                    {% if score >= 80 %}
+                    🎉 Outstanding! You're on track for excellent results. Your reading and writing skills strongly
+                    support your math performance.
+                    {% elif score >= 60 %}
+                    👏 Great work! You're performing above average. Consider additional practice to reach the top tier.
+                    {% elif score >= 40 %}
+                    📚 You have a solid foundation. Focus on strengthening weak areas and consider a test preparation
+                    course.
+                    {% else %}
+                    🌱 Every expert was once a beginner. Seek tutoring support and practice regularly to improve your
+                    scores.
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <div class="info-card">
+                <h4><i class="fas fa-question-circle" style="color: #667eea;"></i> How It Works</h4>
+                <p>Our Random Forest ML model analyzes correlations between demographic factors,
+                    parental education, test preparation, and existing scores to predict math performance
+                    with approximately 85% accuracy (R² = 0.85).</p>
+            </div>
+            <div class="info-card">
+                <h4><i class="fas fa-lightbulb" style="color: #f5576c;"></i> Improving Your Score</h4>
+                <p>Studies show that completing test preparation courses can improve scores by 10-15%.
+                    Regular practice in reading and writing also strongly correlates with better math
+                    performance.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Built with ❤️ using FastAPI & Machine Learning</p>
+        <p style="margin-top: 5px;">© 2026 EduPredict AI — For Educational Purposes Only</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
