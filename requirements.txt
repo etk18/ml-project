@@ -11,5 +11,5 @@ setuptools
 dill
 python-multipart
 jinja2
-
+gunicorn
 -e .
